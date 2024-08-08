@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from app import app
-from werkzeug.security import check_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy(app)
 
@@ -13,12 +13,21 @@ class User(db.Model):
   passhash = db.Column(db.String(512), nullable = False)
   type = db.Column(db.String(16), nullable = False)
 
+  @property
+  def password(self):
+    raise AttributeError('Password is not a readable attribute.')
+  
+  @password.setter
+  def password(self, password):
+    self.passhash = generate_password_hash(password)
+
   def check_password(self, password):
     return check_password_hash(self.passhash, password)
 
 class Sponsor(db.Model):
   __tablename__ = 'sponsor'
-  id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+  id = db.Column(db.Integer, primary_key = True, nullable = False)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
   name = db.Column(db.String(64), nullable = False)
   industry = db.Column(db.String(32), nullable = False)
   budget = db.Column(db.Float, nullable = False)
@@ -26,7 +35,8 @@ class Sponsor(db.Model):
 
 class Influencer(db.Model):
   __tablename__ = 'influencer'
-  id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key = True)
+  id = db.Column(db.Integer, primary_key = True, nullable = False)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
   name = db.Column(db.String(64), nullable = False)
   category = db.Column(db.String(32), nullable = False)
   niche = db.Column(db.String(32), nullable = False)
