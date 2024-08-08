@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, User
+from models import db, User, Sponsor, Influencer, Campaign, Ad_Request
 from app import app
 
 @app.route('/')
@@ -56,20 +56,59 @@ def register_sponsor():
 def register_sponsor_post():
   username = request.form.get('username')
   password = request.form.get('password')
+  name = request.form.get('name')
+  industry = request.form.get('industry')
+  budget = request.form.get('budget')
   if username == "" or password == "":
     flash('Username or password cannot be empty.')
-    return redirect(url_for('register_admin'))
+    return redirect(url_for('register_sponsor'))
+  try:
+    float(budget)
+  except ValueError:
+    flash('Budget must be a number.')
+    return redirect(url_for('register_sponsor'))
   user = User.query.filter_by(username=username).first()
   if user:
     flash('Username already exists. Please select some other username.')
-    return redirect(url_for('register_admin'))
-  user = User(username = username, password = password, type = 'sponsor')
-  db.session.add(user)
-  db.session.add()
+    return redirect(url_for('register_sponsor'))
+  new_user = User(username = username, password = password, type = 'sponsor')
+  db.session.add(new_user)
+  user = User.query.filter_by(username=username).first()
+  sponsor = Sponsor(user_id = user.id, name = name, industry = industry, budget = budget)
+  db.session.add(sponsor)
   db.session.commit()
   flash('User successfully registered.')
   return redirect(url_for('login'))
 
 @app.route('/register/influencer')
-def influencer():
+def register_influencer():
   return render_template('register-influencer.html')
+
+@app.route('/register/influencer', methods=['POST'])
+def register_influencer_post():
+  username = request.form.get('username')
+  password = request.form.get('password')
+  category = request.form.get('category')
+  name = request.form.get('name')
+  niche = request.form.get('niche')
+  reach = request.form.get('reach')
+  try:
+    int(reach)
+  except ValueError:
+    flash('Reach must be an integer.')
+    return redirect(url_for('register_influencer'))
+  if username == "" or password == "":
+    flash('Username or password cannot be empty.')
+    return redirect(url_for('register_influencer'))
+  user = User.query.filter_by(username=username).first()
+  if user:
+    flash('Username already exists. Please select some other username.')
+    return redirect(url_for('register_influencer'))
+  new_user = User(username = username, password = password, type = 'influencer')
+  db.session.add(new_user)
+  user = User.query.filter_by(username=username).first()
+  influencer = Influencer(user_id = user.id, name = name, category = category, niche = niche, reach = reach)
+  db.session.add(influencer)
+  db.session.commit()
+  flash('User successfully registered.')
+  return redirect(url_for('login'))
