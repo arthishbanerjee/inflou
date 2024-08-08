@@ -1,3 +1,4 @@
+from flask import session
 from flask_sqlalchemy import SQLAlchemy
 from app import app
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -72,3 +73,9 @@ class Ad_Request(db.Model):
 # create a database if it doesn't exist
 with app.app_context():
   db.create_all()
+  # create a basic admin
+  admin = User.query.filter_by(username='admin').first()
+  if not admin:
+    admin = User(username = 'admin', password = 'admin', type = 'admin')
+    db.session.add(admin)
+    db.session.commit()

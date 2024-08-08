@@ -1,10 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from functools import wraps
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from models import db, User, Sponsor, Influencer, Campaign, Ad_Request
 from app import app
 
+def auth_required(func):
+  @wraps(func)
+  def inner(*args, **kwargs):
+    if 'user_id' not in session:
+      flash('You need to login first.')
+      return redirect(url_for('login'))
+    return func(*args, **kwargs)
+  return inner
+
 @app.route('/')
+@auth_required
 def index():
-  return render_template('index.html')
+  return render_template('index.html', user = User.query.get(session['user_id']))
 
 @app.route('/login')
 def login():
@@ -25,7 +36,40 @@ def login_post():
     flash('Incorrect password.')
     return redirect(url_for('login'))
   # if the login is succesful
-  return redirect(url_for('index'))
+  session['user_id'] = user.id
+  if user.type == 'sponsor':
+    return redirect(url_for('sponsor_home'))
+  if user.type == 'influencer':
+    return redirect(url_for('influencer_home'))
+  return redirect(url_for('admin_home'))
+
+@app.route('/admin/home')
+@auth_required
+def admin_home():
+  user = User.query.filter_by(id=session['user_id']).first()
+  if not user.type=='admin':
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('home-admin.html', user=user)
+
+@app.route('/sponsor/home')
+@auth_required
+def sponsor_home():
+  user = Sponsor.query.filter_by(user_id=session['user_id']).first()
+  if not user:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('home-sponsor.html', user=user)
+
+@app.route('/influencer/home')
+@auth_required
+def influencer_home():
+  user = Influencer.query.filter_by(user_id=session['user_id']).first()
+  if not user:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('home-influencer.html', user=user)
+
 
 @app.route('/register/admin')
 def register_admin():
@@ -111,4 +155,9 @@ def register_influencer_post():
   db.session.add(influencer)
   db.session.commit()
   flash('User successfully registered.')
+  return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+  session.pop('user_id', None)
   return redirect(url_for('login'))
