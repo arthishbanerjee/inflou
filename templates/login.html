@@ -4,14 +4,10 @@
 Login - Inflou
 {% endblock %}
 
-{% block pages %}
-{% include 'nav-auth.html' %}
-{% endblock %}
-
 {% block content %}
 <h1 class="mt-5">Login to Inflou!</h1>
 <form method="post" class="mt-5">
-  <label for="username" class="form-label">Username
+  <label for="username" class="form-label mb-0">Username
     <input type="text" name="username" id="username" class="form-control" required>
   </label>
   <br>

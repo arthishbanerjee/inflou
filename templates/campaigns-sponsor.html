@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Campaigns - Inflou
+{% endblock %}
+
+{% block content %}
+  <h3 class="mt-4">Campaigns</h3>
+  <h4 class="text-muted">By {{sponsor.name}} (@{{user.username}})</h4>
+
+  <div>
+    <h5 class="mt-5 mb-0 text-center">Active Campaigns</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Description</th>
+          <th scope="col">Start Date</th>
+          <th scope="col">End Date</th>
+          <th scope="col">Budget</th>
+          <th scope="col">Visibility</th>
+          <th scope="col">Goal</th>
+          <th scope="col" colspan="3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for campaign in campaigns %}
+        <tr>
+          <th scope="row">{{loop.index}}</th>
+          <td>{{campaign.description}}</td>
+          <td>{{campaign.start_date}}</td>
+          <td>{{campaign.end_date}}</td>
+          <td>{{campaign.budget}}</td>
+          <td>{{campaign.visibility}}</td>
+          <td>{{campaign.goal}}</td>
+          <td><a class="btn btn-secondary" href="#" role="button"><i class="fa-solid fa-eye"></i></a></td>
+          <td><a class="btn btn-warning" href="#" role="button"><i class="fa-solid fa-pen-to-square"></i></a></td>
+          <td><a class="btn btn-danger" href="/sponsor/campaigns/{{campaign.id}}/delete" role="button"><i class="fa-solid fa-trash"></i></a></td>
+        </tr>
+        {% endfor %}
+        <form method="post">
+          <tr>
+            <th scope="row"></th>
+            <td><input type="text" name="description" id="description" class="form-control" required></td>
+            <td><input type="date" name="start_date" id="start_date" class="form-control" required></td>
+            <td><input type="date" name="end_date" id="end_date" class="form-control" required></td>
+            <td><input type="text" name="budget" id="budget" class="form-control" required></td>
+            <td><select name="visibility" id="visibility"  class="form-select">
+              <option selected value="public">public</option>
+              <option value="private">private</option>
+            </select></td>
+            <td><input type="text" name="goal" id="goal" class="form-control" required></td>
+            <td colspan="3"><button class="btn btn-success" type="submit" value="Add"><i class="fa-solid fa-plus"></i> Add</button></td>
+          </tr>
+        </form>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

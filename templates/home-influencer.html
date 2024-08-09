@@ -4,10 +4,7 @@
   Home - Inflou
 {% endblock %}
 
-{% block pages %}
-  {% include 'nav-influencer.html'   %}
-{% endblock %}
-
 {% block content %}
-  Hi {{user.name}}! This is the INFLUENCER index page.
+  <h3 class="mt-3 mb-0">Hi {{influencer.name}}!</h3>
+  <h4 class="text-muted">@{{user.username}}</h>
 {% endblock %}
