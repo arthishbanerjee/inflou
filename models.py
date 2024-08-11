@@ -32,6 +32,7 @@ class Sponsor(db.Model):
   name = db.Column(db.String(64), nullable = False)
   industry = db.Column(db.String(32), nullable = False)
   budget = db.Column(db.Float, nullable = False)
+  flag = db.Column(db.Boolean, default=False, nullable=False)
   # id(FK), name, industry, budget
 
 class Influencer(db.Model):
@@ -42,6 +43,8 @@ class Influencer(db.Model):
   category = db.Column(db.String(32), nullable = False)
   niche = db.Column(db.String(32), nullable = False)
   reach = db.Column(db.Integer, nullable = False)
+  earnings = db.Column(db.Float, default=0.0, nullable = False)
+  flag = db.Column(db.Boolean, default=False, nullable=False)
   # id(FK), name, category, niche, reach
 
 class Campaign(db.Model):
@@ -54,6 +57,8 @@ class Campaign(db.Model):
   budget = db.Column(db.Float, nullable = False)
   visibility = db.Column(db.Integer, nullable = False)
   goal = db.Column(db.Integer, nullable = False)
+  niche = db.Column(db.String(32), default='', nullable = False)
+  flag = db.Column(db.Boolean, default=False, nullable=False)
   # name, description, start_date, end_date, budget, visibility, goals
 
   # relationship
@@ -67,7 +72,11 @@ class Ad_Request(db.Model):
   messages = db.Column(db.String(256), nullable = False)
   requirements = db.Column(db.String(256), nullable = False)
   payment_amount = db.Column(db.Float, nullable = False)
-  status = db.Column(db.String(16), nullable = False)
+  sponsor_status = db.Column(db.String(16), default='pending', nullable = False)
+  influencer_status = db.Column(db.String(16), default='pending', nullable = False)
+  by_sponsor = db.Column(db.Boolean, default=False, nullable=False)
+  by_influencer = db.Column(db.Boolean, default=False, nullable=False)
+  flag = db.Column(db.Boolean, default=False, nullable=False)
   # campaign_id(FK), influencer_id, messaes, requirements, payment_amount, status
 
 # create a database if it doesn't exist

@@ -1,0 +1,134 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  View Campaign - Inflou
+{% endblock %}
+
+{% block content %}
+<h3 class="mt-4">Campaign #{{campaign.id}}</h3>
+<h5><b>Progress:</b> {{progress}}%</h5>
+
+<div>
+  <br>
+  <b>Budget:</b> {{campaign.budget}} <br>
+  <b>Total spend:</b> {{spend}}
+</div>
+
+<div>
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th scope="col">Description</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Budget</th>
+        <th scope="col">Visibility</th>
+        <th scope="col">Niche</th>
+        <th scope="col">Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <form>
+        <tr>
+          <td>{{campaign.description}}</td>
+          <td>{{campaign.start_date}}</td>
+          <td>{{campaign.end_date}}</td>
+          <td>{{campaign.budget}}</td>
+          <td>{{campaign.visibility}}</td>
+          <td>{{campaign.niche}}</td>
+          <td>{{campaign.goal}}</td>
+          <td>
+            {% if sponsor %}
+            <a class="btn btn-info" href="{{url_for('sponsor_campaigns')}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% elif influencer %}
+            <a class="btn btn-info" href="{{url_for('influencer_stats')}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% else %}
+            <a class="btn btn-info" href="{{url_for('admin_home')}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+      </form>
+    </tbody>
+  </table>
+</div>
+
+<div>
+  <h5 class="mt-5 mb-0 text-center">Active Ad Requests</h5>
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Campaign ID</th>
+        <th scope="col">Influencer</th>
+        <th scope="col">Messages</th>
+        <th scope="col">Requirements</th>
+        <th scope="col">Payment Amount</th>
+        <th scope="col">Sponsor status</th>
+        <th scope="col">Influencer status</th>
+        <th scope="col" colspan="4">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ad in ads %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>#{{ad.campaign_id}}</td>
+        <td>@{{User.query.filter_by(id=Influencer.query.filter_by(id=ad.influencer_id).first().user_id).first().username}}</td>
+        <td>{{ad.messages}}</td>
+        <td>{{ad.requirements}}</td>
+        <td>{{ad.payment_amount}}</td>
+        <td>{{ad.sponsor_status}}</td>
+        <td>{{ad.influencer_status}}</td>
+        {% if sponsor %}
+          <td><a class="btn btn-outline-success" href="/sponsor/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/accept" role="button"><i class="fa-solid fa-check"></i></a></td>
+          <td><a class="btn btn-outline-danger" href="/sponsor/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/reject" role="button"><i class="fa-solid fa-xmark"></i></a></td>
+          {% if ad.by_sponsor %}
+          <td><a class="btn btn-warning" href="/sponsor/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/edit" role="button"><i class="fa-solid fa-pen-to-square"></i></a></td>
+          <td><a class="btn btn-danger" href="/sponsor/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/delete" role="button"><i class="fa-solid fa-trash"></i></a></td>          
+          {% else %}
+            <td></td>
+            <td></td>
+          {% endif %}
+        {% endif %}
+        {% if influencer %}
+          <td><a class="btn btn-outline-success" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/accept" role="button"><i class="fa-solid fa-check"></i></a></td>
+          <td><a class="btn btn-outline-danger" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/reject" role="button"><i class="fa-solid fa-xmark"></i></a></td>
+          {% if ad.by_influencer %}
+          <td><a class="btn btn-warning" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/edit" role="button"><i class="fa-solid fa-pen-to-square"></i></a></td>
+          <td><a class="btn btn-danger" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/delete" role="button"><i class="fa-solid fa-trash"></i></a></td>          
+          {% else %}
+            <td></td>
+            <td></td>
+          {% endif %}
+        {% endif %}
+      </tr>
+      {% endfor %}
+      <form method="post">
+        <tr>
+          <th scope="row"></th>
+          <td></td>
+          <td>
+            {% if sponsor %}
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">@</span>
+              <input class="form-control" list="influencers" name="influencer_username" id="influencer_username" placeholder="Type to search...">
+              <datalist id="influencers">
+                {% for inf in Influencer.query.all() %}
+                  <option value="{{User.query.filter_by(id=inf.user_id).first().username}}"></option>
+                {% endfor %}
+              </datalist>
+            </div>
+            {% endif %}            
+          </td>
+          <td><input type="text" name="messages" id="messages" class="form-control" required></td>
+          <td><input type="text" name="requirements" id="requirements" class="form-control" required></td>
+          <td><input type="text" name="payment_amount" id="payment_amount" class="form-control" required></td>
+          <td></td>
+          <td></td>
+          <td colspan="4"><button class="btn btn-success" type="submit" value="Add"><i class="fa-solid fa-plus"></i> Add</button></td>
+        </tr>
+      </form>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

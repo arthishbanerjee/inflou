@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Edit Ad Request - Inflou
+{% endblock %}
+
+{% block content %}
+<div>
+  <h5 class="mt-5 mb-0 text-center">Active Ad Requests</h5>
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Campaign ID</th>
+        {% if sponsor %}
+          <th scope="col">Influencer</th>
+        {% endif %}
+        <th scope="col">Messages</th>
+        <th scope="col">Requirements</th>
+        <th scope="col">Payment Amount</th>
+        <th scope="col" colspan="4">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <form method="post">
+        <tr>
+          <th scope="row"></th>
+          <td></td>
+          <td>
+            {% if sponsor %}
+            <div class="input-group">
+              <span class="input-group-text" id="basic-addon1">@</span>
+              <input class="form-control" value="{{User.query.filter_by(id=Influencer.query.filter_by(id=ad.influencer_id).first().user_id).first().username}}" list="influencers" name="influencer_username" id="influencer_username" placeholder="Type to search...">
+              <datalist id="influencers">
+                {% for influencer in Influencer.query.all() %}
+                  <option value="{{User.query.filter_by(id=influencer.user_id).first().username}}"></option>
+                {% endfor %}
+              </datalist>
+            </div>
+            {% endif %}
+          </td>
+          <td><input type="text" value="{{ad.messages}}" name="messages" id="messages" class="form-control" required></td>
+          <td><input type="text" value="{{ad.requirements}}" name="requirements" id="requirements" class="form-control" required></td>
+          <td><input type="text" value="{{ad.payment_amount}}" name="payment_amount" id="payment_amount" class="form-control" required></td>
+          <td colspan="2">
+            {% if sponsor %}
+            <a class="btn btn-info" href="{{url_for('sponsor_campaigns_view', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% elif influencer %}
+            <a class="btn btn-info" href="{{url_for('influencer_campaigns_view', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% else %}
+            <a class="btn btn-info" href="{{url_for('admin_home', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% endif %}
+          </td>
+          <td><button class="btn btn-primary" type="submit" value="Add"><i class="fa-solid fa-floppy-disk"></i></button></td>
+        </tr>
+      </form>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

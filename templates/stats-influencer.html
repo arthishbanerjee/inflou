@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Stats - Inflou
+{% endblock %}
+
+{% block content %}
+
+<h4 class="mt-4">Hi, {{influencer.name}}!</h4>
+
+<b>Lifetime earnings:</b> {{earnings}} <br>
+<b>Missed earnings:</b> {{missed}}
+
+<div>
+  <h5 class="mt-5 mb-0 text-center">Active Ad Requests</h5>
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Campaign ID</th>
+        <th scope="col">Messages</th>
+        <th scope="col">Requirements</th>
+        <th scope="col">Payment Amount</th>
+        <th scope="col">Sponsor status</th>
+        <th scope="col">Influencer status</th>
+        <th scope="col" colspan="4">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ad in adreqs %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>#{{ad.campaign_id}}</td>
+        <td>{{ad.messages}}</td>
+        <td>{{ad.requirements}}</td>
+        <td>{{ad.payment_amount}}</td>
+        <td>{{ad.sponsor_status}}</td>
+        <td>{{ad.influencer_status}}</td>
+        <td><a class="btn btn-secondary" href="{{url_for('influencer_campaigns_view', id=ad.campaign_id)}}" role="button"><i class="fa-solid fa-eye"></i></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="height: 50vh; width: 50%;">
+  <canvas id="myChart"></canvas>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+</script>
+{% endblock %}

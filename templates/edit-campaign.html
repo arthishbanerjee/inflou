@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Edit Campaign - Inflou
+{% endblock %}
+
+{% block content %}
+  <h3 class="mt-4">Editing Campaign #{{campaign.id}}</h3>
+
+  <table class="table table-striped mt-4">
+    <thead>
+      <tr>
+        <th scope="col">Description</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Budget</th>
+        <th scope="col">Visibility</th>
+        <th scope="col">Niche</th>
+        <th scope="col">Goal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <form method="post">
+        <tr>
+          <td><input type="text" name="description" id="description" class="form-control" required value="{{campaign.description}}"></td>
+          <td><input type="date" name="start_date" id="start_date" class="form-control" required value="{{campaign.start_date}}"></td>
+          <td><input type="date" name="end_date" id="end_date" class="form-control" required value="{{campaign.end_date}}"></td>
+          <td><input type="text" name="budget" id="budget" class="form-control" required value="{{campaign.budget}}"></td>
+          <td><select name="visibility" id="visibility"  class="form-select" required>
+            <option value="public" {% if campaign.visibility == 'public' %} selected {% endif %}>public</option>
+            <option value="private" {% if campaign.visibility == 'private' %} selected {% endif %}>private</option>
+          </select></td>
+          <td><input type="text" name="niche" id="niche" class="form-control" required value="{{campaign.niche}}"></td>
+          <td><input type="text" name="goal" id="goal" class="form-control" required value="{{campaign.goal}}"></td>
+          <td><a class="btn btn-info" href="{{url_for('sponsor_campaigns')}}" role="button"><i class="fa-solid fa-chevron-left"></i></a></td>
+          <td><button class="btn btn-primary" type="submit" value="Add"><i class="fa-solid fa-floppy-disk"></i></button></td>
+        </tr>
+      </form>
+    </tbody>
+  </table>
+{% endblock %}

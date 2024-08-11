@@ -1,0 +1,78 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Find - Inflou
+{% endblock %}
+
+{% block content %}
+<div class="search-bar mt-3 text-center">
+  <form method="post">
+    <select name="category" id="category"  class="form-select select">
+      <option value="budget" {% if category=='budget' %}selected{% endif %}>Min. Budget</option>
+      <option value="niche" {% if category=='niche' %}selected{% endif %}>Niche</option>
+    </select>
+    <input type="text" class="form-control search" name="search" id="search" placeholder="Type to search..." value="{{searchKey}}">
+    <button class="btn btn-outline-secondary searchButton" type="submit" value="Add"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+  </form>
+</div>
+
+{% if campaigns %}
+<div>
+  <h4 class="text-center mt-4">Campaigns</h4>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Description</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Budget</th>
+        <th scope="col">Visibility</th>
+        <th scope="col">Niche</th>
+        <th scope="col">Goal</th>
+        <th scope="col" colspan="3">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for campaign in campaigns %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{campaign.description}}</td>
+        <td>{{campaign.start_date}}</td>
+        <td>{{campaign.end_date}}</td>
+        <td>{{campaign.budget}}</td>
+        <td>{{campaign.visibility}}</td>
+        <td>{{campaign.niche}}</td>
+        <td>{{campaign.goal}}</td>
+        <td><a class="btn btn-secondary" href="/influencer/campaigns/{{campaign.id}}/view" role="button"><i class="fa-solid fa-eye"></i></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block style %}
+<style>
+  form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .select {
+    flex: 1 1 0;
+  }
+  .search {
+    flex: 9 1 0;
+  }
+  .searchButton {
+    flex: 1 1 0;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+</style>
+{% endblock %}
