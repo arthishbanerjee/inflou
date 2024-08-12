@@ -5,7 +5,34 @@
 {% endblock %}
 
 {% block content %}
-  <h3 class="mt-3 mb-0">Hi, {{influencer.name}}!</h3>
-  <h4 class="text-muted">@{{user.username}}</h4>
-  This is your profile page.
+  <div class="container" style="margin-inline: auto;">
+    <h5 class="mt-5 mb-0 text-muted">Influencer Profile</h5>
+    <h3 class="mt-3 mb-0">{{inf.name}}</h3>
+    <h4 class="text-muted">@{{username}}</h4>
+    <div class="mt-4" style="width: 25%;">
+      <table class="table table-striped">
+        <tbody>
+          <tr>
+            <th scope="row">Category</th>
+            <td>{{inf.category}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Niche</th>
+            <td>{{inf.niche}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Reach</th>
+            <td>{{inf.reach}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Flagged (Yes/No)</th>
+            <td>{% if inf.flag %} Yes {% else %} No {% endif %}</td>
+          </tr>
+        </tbody>
+      </table>
+      {% if influencer %}
+      <a class="btn btn-warning text-center" href="{{url_for('influencer_profile_edit')}}" role="button"><i class="fa-solid fa-pen-to-square"></i> Edit Profile</a>
+      {% endif %}
+    </div>
+  </div>
 {% endblock %}

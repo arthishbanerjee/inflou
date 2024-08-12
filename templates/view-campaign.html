@@ -65,7 +65,7 @@
         <th scope="col">Payment Amount</th>
         <th scope="col">Sponsor status</th>
         <th scope="col">Influencer status</th>
-        <th scope="col" colspan="4">Actions</th>
+        <th scope="col" colspan="5">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -93,6 +93,7 @@
         {% if influencer %}
           <td><a class="btn btn-outline-success" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/accept" role="button"><i class="fa-solid fa-check"></i></a></td>
           <td><a class="btn btn-outline-danger" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/reject" role="button"><i class="fa-solid fa-xmark"></i></a></td>
+          <td><a class="btn btn-outline-warning" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/negotiate" role="button"><i class="fa-solid fa-comments-dollar"></i></i></a></td>
           {% if ad.by_influencer %}
           <td><a class="btn btn-warning" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/edit" role="button"><i class="fa-solid fa-pen-to-square"></i></a></td>
           <td><a class="btn btn-danger" href="/influencer/campaigns/{{campaign.id}}/adreqs/{{ad.id}}/delete" role="button"><i class="fa-solid fa-trash"></i></a></td>          

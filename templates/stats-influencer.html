@@ -6,10 +6,7 @@
 
 {% block content %}
 
-<h4 class="mt-4">Hi, {{influencer.name}}!</h4>
-
-<b>Lifetime earnings:</b> {{earnings}} <br>
-<b>Missed earnings:</b> {{missed}}
+<h4 class="mt-4 text-center">Hi, {{influencer.name}}!</h4>
 
 <div>
   <h5 class="mt-5 mb-0 text-center">Active Ad Requests</h5>
@@ -43,12 +40,33 @@
   </table>
 </div>
 
-<div style="height: 50vh; width: 50%;">
-  <canvas id="myChart"></canvas>
+<div style="width: 600px; height: 400px; margin-inline: auto;">
+  <h5 class="mt-5 mb-0 text-center">Earning Breakdown</h5><br>
+  <canvas id="myChart" width="150" height="100"></canvas>
 </div>
+<div><br></div>
 {% endblock %}
 
 {% block script %}
 <script>
+  var ctx = document.getElementById("myChart").getContext("2d");
+  var myChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      label: "Breakdown of earnings from ads",
+      data: [{{earnings}}, {{missed}}],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 99, 132, 0.5)'
+      ]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Lifetime earnings',
+        'Missed earnings'
+    ]
+}});
 </script>
 {% endblock %}

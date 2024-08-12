@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Dashboard - Inflou
+{% endblock %}
+
+{% block content %}
+
+<div class="search-bar mt-3 text-center">
+  <form method="post">
+    <select name="category" id="category"  class="form-select select">
+      <option value="name" {% if category=='budget' %}selected{% endif %}>Name</option>
+      <option value="niche" {% if category=='niche' %}selected{% endif %}>Niche</option>
+      <option value="reach" {% if category=='reach' %}selected{% endif %}>Min. Reach</option>
+    </select>
+    <input type="text" class="form-control search" name="search" id="search" placeholder="Type to search..." value="{{searchKey}}">
+    <button class="btn btn-outline-secondary searchButton" type="submit" value="Add"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+  </form>
+</div>
+
+  <div>
+    <h5 class="mt-5 text-center">Influencers</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Influencer ID</th>
+          <th scope="col">Username</th>
+          <th scope="col">Name</th>
+          <th scope="col">Category</th>
+          <th scope="col">Niche</th>
+          <th scope="col">Reach</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form>
+          {% for influencer in influencers %}
+          {% set username = User.query.filter_by(id=influencer.user_id).first().username %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{influencer.id}}</td>
+            <td>@{{username}}</td>
+            <td>{{influencer.name}}</td>
+            <td>{{influencer.category}}</td>
+            <td>{{influencer.niche}}</td>
+            <td>{{influencer.reach}}</td>
+            <td>
+              <a class="btn btn-secondary" href="{{url_for('influencer_profile_public', username=username, sponsor=sponsor)}}" role="button"><i class="fa-solid fa-eye"></i></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </form>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+{% block style %}
+<style>
+  form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .select {
+    flex: 1 1 0;
+  }
+  .search {
+    flex: 9 1 0;
+  }
+  .searchButton {
+    flex: 1 1 0;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+</style>
+{% endblock %}

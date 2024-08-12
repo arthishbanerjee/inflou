@@ -1,6 +1,6 @@
 from functools import wraps
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, session
 from models import db, User, Sponsor, Influencer, Campaign, Ad_Request
 from app import app
 
@@ -91,6 +91,124 @@ def admin_home():
   user = User.query.filter_by(id=session['user_id']).first()
   return render_template('home-admin.html', user=user)
 
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+  user = User.query.filter_by(id=session['user_id']).first()
+  influencers = Influencer.query.all()
+  flagged_inf = 0.0
+  unflagged_inf = 0.0
+  for inf in influencers:
+    if inf.flag == True:
+      flagged_inf += 1
+    else:
+      unflagged_inf += 1
+  sponsors = Sponsor.query.all()
+  flagged_spon = 0.0
+  unflagged_spon = 0.0
+  for spon in sponsors:
+    if spon.flag == True:
+      flagged_spon += 1
+    else:
+      unflagged_spon += 1
+  campaigns = Campaign.query.all()
+  flagged_camp = 0.0
+  unflagged_camp = 0.0
+  for camp in campaigns:
+    if camp.flag == True:
+      flagged_camp += 1
+    else:
+      unflagged_camp += 1
+  ads = Ad_Request.query.all()
+  flagged_ads = 0.0
+  unflagged_ads = 0.0
+  for ad in ads:
+    if ad.flag == True:
+      flagged_ads += 1
+    else:
+      unflagged_ads += 1
+  return render_template('dashboard-admin.html', user=user, influencers=influencers, sponsors=sponsors, campaigns=campaigns, ads=ads, flagged_inf=flagged_inf, unflagged_inf=unflagged_inf, flagged_spon=flagged_spon, unflagged_spon=unflagged_spon, flagged_camp=flagged_camp, unflagged_camp=unflagged_camp, flagged_ads=flagged_ads, unflagged_ads=unflagged_ads)
+
+@app.route('/admin/campaign/<int:campaign_id>/flag')
+@admin_required
+def admin_campaign_flag(campaign_id):
+  campaign = Campaign.query.filter_by(id=campaign_id).first()
+  if campaign.flag == True:
+    campaign.flag = False
+  else:
+    campaign.flag = True
+  db.session.commit()
+  return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/sponsor/<int:sponsor_id>/flag')
+@admin_required
+def admin_sponsor_flag(sponsor_id):
+  sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+  if sponsor.flag == True:
+    sponsor.flag = False
+  else:
+    sponsor.flag = True
+  db.session.commit()
+  return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/influencer/<int:influencer_id>/flag')
+@admin_required
+def admin_influencer_flag(influencer_id):
+  influencer = Influencer.query.filter_by(id=influencer_id).first()
+  if influencer.flag == True:
+    influencer.flag = False
+  else:
+    influencer.flag = True
+  db.session.commit()
+  return redirect(url_for('admin_dashboard'))
+
+@app.route('/admin/ad/<int:ad_id>/flag')
+@admin_required
+def admin_ad_flag(ad_id):
+  ad = Ad_Request.query.filter_by(id=ad_id).first()
+  if ad.flag == True:
+    ad.flag = False
+  else:
+    ad.flag = True
+  db.session.commit()
+  return redirect(url_for('admin_dashboard'))
+
+@app.route('/sponsor/find')
+@sponsor_required
+def sponsor_find():
+  user = User.query.filter_by(id=session['user_id']).first()
+  sponsor = Sponsor.query.filter_by(user_id=session['user_id']).first()
+  influencer = Influencer.query.all()
+  if not sponsor:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('find-sponsor.html', User=User, user=user, influencer=influencer, sponsor=sponsor)
+
+@app.route('/sponsor/find', methods=['POST'])
+@sponsor_required
+def sponsor_find_post():
+  user = User.query.filter_by(id=session['user_id']).first()
+  sponsor = Sponsor.query.filter_by(user_id=session['user_id']).first()
+  search = request.form.get('search')
+  searchKey = "%{}%".format(search)
+  category = request.form.get('category')
+  influencers = Influencer.query.all()
+  if category == 'name':
+    influencers = Influencer.query.filter(Influencer.name.like(searchKey))
+  if category == 'niche':
+    influencers = Influencer.query.filter(Influencer.niche.like(searchKey))
+  if category == 'reach':
+    try:
+      int(search)
+    except ValueError:
+      flash('Reach must be an integer.')
+      return redirect(url_for('sponsor_find'))
+    influencers = Influencer.query.filter(Influencer.reach >= search)
+  if not user:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('find-sponsor.html', User=User, user=user, sponsor=sponsor, influencers=influencers, searchKey=search, category=category)
+
 @app.route('/sponsor/home')
 @sponsor_required
 def sponsor_home():
@@ -145,6 +263,8 @@ def sponsor_campaigns_adreq_edit_post(campaign_id, ad_id):
   ad.messages = messages
   ad.requirements = requirements
   ad.payment_amount = payment_amount
+  ad.sponsor_status = 'pending'
+  ad.influencer_status = 'pending'
   db.session.commit()
   return redirect(url_for('sponsor_campaigns_view', id = campaign_id))
 
@@ -312,6 +432,8 @@ def sponsor_campaigns_post():
   db.session.commit()
   return redirect(url_for('sponsor_campaigns'))
 
+
+
 @app.route('/influencer/profile')
 @influencer_required
 def influencer_profile():
@@ -320,7 +442,72 @@ def influencer_profile():
   if not influencer:
     flash('Improper access. You have been logged out.')
     return redirect(url_for('logout'))
-  return render_template('profile-influencer.html', influencer=influencer, user=user)
+  return render_template('profile-influencer.html', inf=influencer, influencer=influencer, username=user.username, user=user)
+
+@app.route('/influencer/profile/edit')
+@influencer_required
+def influencer_profile_edit():
+  user = User.query.filter_by(id=session['user_id']).first()
+  influencer = Influencer.query.filter_by(user_id=session['user_id']).first()
+  if not influencer:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('profile-influencer-edit.html', inf=influencer, influencer=influencer, username=user.username, user=user)
+
+@app.route('/influencer/profile/edit', methods=['POST'])
+@influencer_required
+def influencer_profile_edit_post():
+  user = User.query.filter_by(id=session['user_id']).first()
+  influencer = Influencer.query.filter_by(user_id=session['user_id']).first()
+  if not influencer:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  influencer.category = request.form.get('category')
+  influencer.niche = request.form.get('niche')
+  reach = request.form.get('reach')
+  try:
+    int(reach)
+  except ValueError:
+    flash('Reach must be an integer.')
+    return redirect(url_for('influencer_profile_edit'))
+  db.session.commit()
+  return redirect(url_for('influencer_profile'))
+  # return render_template('profile-influencer.html', inf=influencer, influencer=influencer, username=user.username, user=user)
+
+@app.route('/influencer/<username>/profile')
+@auth_required
+def influencer_profile_public(username):
+  user = User.query.filter_by(id=session['user_id']).first()
+  sponsor = False
+  influencer = False
+  if user.type == 'sponsor':
+    sponsor = True
+  elif user.type == 'influencer':
+    influencer = True
+  else:
+    sponsor = False
+    influencer = False
+  inf_userid = User.query.filter_by(username=username).first().id
+  inf = Influencer.query.filter_by(user_id=inf_userid).first()
+  if not user:
+    flash('Improper access. You have been logged out.')
+    return redirect(url_for('logout'))
+  return render_template('profile-influencer.html', inf=inf, username=username, user=user, sponsor=sponsor, influencer=influencer)
+
+# THIS IS AN API ENDPOINT FOR THE PROFILE
+@app.route('/influencer/<username>/profile/get', methods=['GET'])
+def influencer_profile_public_get(username):
+  inf_userid = User.query.filter_by(username=username).first().id
+  inf = Influencer.query.filter_by(user_id=inf_userid).first()
+  data = {
+    "Username": username,
+    "Name": inf.name,
+    "Category": inf.category,
+    "Niche": inf.niche,
+    "Reach": inf.reach,
+    "Flag": inf.flag
+  }
+  return jsonify(data)
 
 @app.route('/influencer/home')
 @influencer_required
@@ -347,7 +534,12 @@ def influencer_find_post():
   category = request.form.get('category')
   campaigns = Campaign.query.filter_by(visibility='public').all()
   if category == 'budget':
-    campaigns = Campaign.query.filter(Campaign.visibility=='public', Campaign.budget>=searchKey)
+    try:
+      float(search)
+    except ValueError:
+      flash('Amount must be a number.')
+      return redirect(url_for('influencer_find'))
+    campaigns = Campaign.query.filter(Campaign.visibility=='public', Campaign.budget>=search)
   if category == 'niche':
     campaigns = Campaign.query.filter(Campaign.visibility=='public', Campaign.niche.like(searchKey))
   if not user:
@@ -481,6 +673,43 @@ def influencer_campaigns_adreq_edit_post(campaign_id, ad_id):
   ad.messages = messages
   ad.requirements = requirements
   ad.payment_amount = payment_amount
+  ad.sponsor_status = 'pending'
+  ad.influencer_status = 'pending'
+  db.session.commit()
+  return redirect(url_for('influencer_campaigns_view', id = campaign_id))
+
+@app.route('/influencer/campaigns/<int:campaign_id>/adreqs/<int:ad_id>/negotiate')
+@influencer_required
+def influencer_campaigns_adreq_negotiate(campaign_id, ad_id):
+  ad = Ad_Request.query.filter_by(id=ad_id).first()
+  user = User.query.filter_by(id=session['user_id']).first()
+  influencer = Influencer.query.filter_by(user_id=session['user_id']).first()
+  if not ad:
+    flash('Ad request does not exist.')
+    return redirect(url_for('influencer_campaigns_view', id = campaign_id, user=user, influencer=influencer))
+  return render_template('edit-adreq.html', ad=ad, user=user, influencer=influencer, neg=True)
+
+@app.route('/influencer/campaigns/<int:campaign_id>/adreqs/<int:ad_id>/negotiate', methods=['POST'])
+@influencer_required
+def influencer_campaigns_adreq_negotiate_post(campaign_id, ad_id):
+  ad = Ad_Request.query.filter_by(id=ad_id).first()
+  campaign = Campaign.query.filter_by(id=campaign_id).first()
+  influencer = Influencer.query.filter_by(user_id=session['user_id']).first()
+  if not ad:
+    flash('Ad request does not exist.')
+    return redirect(url_for('influencer_campaigns_view', id = campaign_id))
+  if not campaign:
+    flash('Campaign does not exist.')
+    return redirect(url_for('influencer_find'))
+  payment_amount = request.form.get('payment_amount')
+  try:
+    float(payment_amount)
+  except ValueError:
+    flash('Amount must be a number.')
+    return redirect(url_for('influencer_campaigns_view', id = campaign_id))
+  ad.payment_amount = payment_amount
+  ad.sponsor_status = 'pending'
+  ad.influencer_status = 'pending'
   db.session.commit()
   return redirect(url_for('influencer_campaigns_view', id = campaign_id))
 

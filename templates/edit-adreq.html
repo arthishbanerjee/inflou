@@ -26,6 +26,21 @@
         <tr>
           <th scope="row"></th>
           <td></td>
+          {% if neg %}
+          <td></td>
+          <td>{{ad.messages}}</td>
+          <td>{{ad.requirements}}</td>
+          <td><input type="text" value="{{ad.payment_amount}}" name="payment_amount" id="payment_amount" class="form-control" required></td>
+          <td colspan="2">
+            {% if sponsor %}
+            <a class="btn btn-info" href="{{url_for('sponsor_campaigns_view', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% elif influencer %}
+            <a class="btn btn-info" href="{{url_for('influencer_campaigns_view', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% else %}
+            <a class="btn btn-info" href="{{url_for('admin_home', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
+            {% endif %}
+          </td>
+          {% else %}
           <td>
             {% if sponsor %}
             <div class="input-group">
@@ -51,6 +66,7 @@
             <a class="btn btn-info" href="{{url_for('admin_home', id = ad.campaign_id)}}" role="button"><i class="fa-solid fa-chevron-left"></i></a>
             {% endif %}
           </td>
+          {% endif %}
           <td><button class="btn btn-primary" type="submit" value="Add"><i class="fa-solid fa-floppy-disk"></i></button></td>
         </tr>
       </form>

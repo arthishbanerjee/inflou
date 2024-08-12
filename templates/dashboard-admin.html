@@ -1,0 +1,282 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Dashboard - Inflou
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mt-5 text-center">Admin Dashboard</h2>
+
+  <div>
+    <h5 class="mt-5 text-center">Influencers</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Influencer ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Category</th>
+          <th scope="col">Niche</th>
+          <th scope="col">Reach</th>
+          <th scope="col">Flag</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form>
+          {% for influencer in influencers %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{influencer.id}}</td>
+            <td>{{influencer.name}}</td>
+            <td>{{influencer.category}}</td>
+            <td>{{influencer.niche}}</td>
+            <td>{{influencer.reach}}</td>
+            <td>{% if influencer.flag == True %} <i class="fa-solid fa-flag text-danger"></i> {% endif %}</td>
+            <td>
+              <a class="btn btn-outline-secondary" href="{{url_for('admin_influencer_flag', influencer_id=influencer.id)}}" role="button"><i class="fa-solid fa-flag"></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </form>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mb-5" style="width: 600px; height: 400px; margin-inline: auto; margin-bottom: 50;">
+    <h5 class="mt-5 mb-0 text-center">Flagging Status of Influencers</h5><br>
+    <canvas id="infChart" width="150" height="100"></canvas>
+    <hr class="hr">
+  </div>
+  <div><br></div>
+
+  <div>
+    <h5 class="mt-5 text-center">Sponsors</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Sponsor ID</th>
+          <th scope="col">Name</th>
+          <th scope="col">Industry</th>
+          <th scope="col">Budget</th>
+          <th scope="col">Flag</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form>
+          {% for sponsor in sponsors %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{sponsor.id}}</td>
+            <td>{{sponsor.name}}</td>
+            <td>{{sponsor.industry}}</td>
+            <td>{{sponsor.budget}}</td>
+            <td>{% if sponsor.flag == True %} <i class="fa-solid fa-flag text-danger"></i> {% endif %}</td>
+            <td>
+              <a class="btn btn-outline-secondary" href="{{url_for('admin_sponsor_flag', sponsor_id=sponsor.id)}}" role="button"><i class="fa-solid fa-flag"></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </form>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mb-5" style="width: 600px; height: 400px; margin-inline: auto; margin-bottom: 50;">
+    <h5 class="mt-5 mb-0 text-center">Flagging Status of Sponsors</h5><br>
+    <canvas id="sponChart" width="150" height="100"></canvas>
+    <hr class="hr">
+  </div>
+  <div><br></div>
+
+  <div>
+    <h5 class="mt-5 text-center">Campaigns</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Campaign ID</th>
+          <th scope="col">Description</th>
+          <th scope="col">Start Date</th>
+          <th scope="col">End Date</th>
+          <th scope="col">Budget</th>
+          <th scope="col">Visibility</th>
+          <th scope="col">Niche</th>
+          <th scope="col">Goal</th>
+          <th scope="col">Flag</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <form>
+          {% for campaign in campaigns %}
+          <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{campaign.id}}</td>
+            <td>{{campaign.description}}</td>
+            <td>{{campaign.start_date}}</td>
+            <td>{{campaign.end_date}}</td>
+            <td>{{campaign.budget}}</td>
+            <td>{{campaign.visibility}}</td>
+            <td>{{campaign.niche}}</td>
+            <td>{{campaign.goal}}</td>
+            <td>{% if campaign.flag == True %} <i class="fa-solid fa-flag text-danger"></i> {% endif %}</td>
+            <td>
+              <a class="btn btn-outline-secondary" href="{{url_for('admin_campaign_flag', campaign_id=campaign.id)}}" role="button"><i class="fa-solid fa-flag"></i></a>
+            </td>
+          </tr>
+          {% endfor %}
+        </form>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mb-5" style="width: 600px; height: 400px; margin-inline: auto; margin-bottom: 50;">
+    <h5 class="mt-5 mb-0 text-center">Flagging Status of Campaigns</h5><br>
+    <canvas id="campChart" width="150" height="100"></canvas>
+    <hr class="hr">
+  </div>
+  <div><br></div>
+
+  <div>
+    <h5 class="mt-5 mb-0 text-center">Active Ad Requests</h5>
+    <table class="table table-striped mt-4">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Campaign ID</th>
+          <th scope="col">Influencer ID</th>
+          <th scope="col">Messages</th>
+          <th scope="col">Requirements</th>
+          <th scope="col">Payment Amount</th>
+          <th scope="col">Sponsor status</th>
+          <th scope="col">Influencer status</th>
+          <th scope="col">Flag</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ad in ads %}
+        <tr>
+          <th scope="row">{{loop.index}}</th>
+          <td>#{{ad.campaign_id}}</td>
+          <td>{{ad.influencer_id}}</td>
+          <td>{{ad.messages}}</td>
+          <td>{{ad.requirements}}</td>
+          <td>{{ad.payment_amount}}</td>
+          <td>{{ad.sponsor_status}}</td>
+          <td>{{ad.influencer_status}}</td>
+          <td>{% if ad.flag == True %} <i class="fa-solid fa-flag text-danger"></i> {% endif %}</td>
+          <td>
+            <a class="btn btn-outline-secondary" href="{{url_for('admin_ad_flag', ad_id=ad.id)}}" role="button"><i class="fa-solid fa-flag"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </form>
+    </tbody>
+  </table>
+</div>
+
+<div class="mb-5" style="width: 600px; height: 400px; margin-inline: auto; margin-bottom: 50;">
+  <h5 class="mt-5 mb-0 text-center">Flagging Status of Ad Requests</h5><br>
+  <canvas id="adsChart" width="150" height="100"></canvas>
+  <hr class="hr">
+</div>
+<div><br></div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+  // THE INFLUENCER CHART
+
+  var infchrt = document.getElementById("infChart").getContext("2d");
+  var myChart = new Chart(infchrt, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      label: "Status of influencers",
+      data: [{{unflagged_inf}}, {{flagged_inf}}],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 99, 132, 0.5)'
+      ]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Unflagged influencers',
+        'Flagged influencers'
+    ]
+}});
+
+  // THE SPONSOR CHART
+
+  var sponchrt = document.getElementById("sponChart").getContext("2d");
+  var myChart = new Chart(sponchrt, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      label: "Status of sponsors",
+      data: [{{unflagged_spon}}, {{flagged_spon}}],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 99, 132, 0.5)'
+      ]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Unflagged sponsors',
+        'Flagged sponsors'
+    ]
+}});
+
+  // THE CAMPAIGN CHART
+
+  var campchrt = document.getElementById("campChart").getContext("2d");
+  var myChart = new Chart(campchrt, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      label: "Status of campaigns",
+      data: [{{unflagged_camp}}, {{flagged_camp}}],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 99, 132, 0.5)'
+      ]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Unflagged campaigns',
+        'Flagged campaigns'
+    ]
+}});
+
+  // THE AD REQUEST CHART
+
+  var adschrt = document.getElementById("adsChart").getContext("2d");
+  var myChart = new Chart(adschrt, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      label: "Status of ad requests",
+      data: [{{unflagged_ads}}, {{flagged_ads}}],
+      backgroundColor: [
+        'rgba(54, 162, 235, 0.5)',
+        'rgba(255, 99, 132, 0.5)'
+      ]
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Unflagged ad requests',
+        'Flagged ad requests'
+    ]
+}});
+</script>
+{% endblock %}
